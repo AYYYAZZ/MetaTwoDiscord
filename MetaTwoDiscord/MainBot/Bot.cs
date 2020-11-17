@@ -2,15 +2,13 @@
 using DSharpPlus.CommandsNext;
 using DSharpPlus.EventArgs;
 using DSharpPlus.Interactivity;
+using DSharpPlus.VoiceNext;
 using Newtonsoft.Json;
 using MetaTwoDiscord.MainBot.Commands;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using DSharpPlus.Interactivity.Extensions;
 
 namespace MetaTwoDiscord.MainBot
 {
@@ -29,24 +27,24 @@ namespace MetaTwoDiscord.MainBot
                 Token = Config.Token,
                 TokenType = TokenType.Bot,
                 AutoReconnect = true,
-                LogLevel = LogLevel.Debug,
-                UseInternalLogHandler = true,
+                MinimumLogLevel = Microsoft.Extensions.Logging.LogLevel.Information
             };
 
             Client = new DiscordClient(config);
-            Client.Ready += OnReady;
 
             var commandsConfig = new CommandsNextConfiguration
             {
                 StringPrefixes = new string[] { Config.Prefix },
                 EnableMentionPrefix = true,
                 EnableDms = false,
+         
             };
 
             Commands = Client.UseCommandsNext(commandsConfig);
             Commands.RegisterCommands<MainCommands>();
 
-            Client.UseInteractivity(new InteractivityConfiguration());
+            Client.UseInteractivity();
+            Client.UseVoiceNext();
 
             await Client.ConnectAsync();
             await Task.Delay(-1);
@@ -62,11 +60,5 @@ namespace MetaTwoDiscord.MainBot
             var configJson = JsonConvert.DeserializeObject<ConfigJson>(json);
             return configJson;
         }
-
-        private Task OnReady(ReadyEventArgs eventArgs)
-        {
-            return Task.CompletedTask;
-        }
-
     }
 }

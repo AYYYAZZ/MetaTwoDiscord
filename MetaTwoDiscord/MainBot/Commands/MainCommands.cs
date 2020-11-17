@@ -7,6 +7,8 @@ using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using MetaTwoDiscord.Methods.MusicControl;
 using System.Linq;
+using DSharpPlus.VoiceNext;
+using DSharpPlus.Interactivity.Extensions;
 
 namespace MetaTwoDiscord.MainBot.Commands
 {
@@ -66,6 +68,22 @@ namespace MetaTwoDiscord.MainBot.Commands
             var indexOfMusic = CheckUserChoose.CheckInteractivity(interactive);
             var musicEmbed = MusicEmbedBuilder.GenerateMusicEmbed(musics[indexOfMusic]);
             await ctx.Channel.SendMessageAsync(embed: musicEmbed).ConfigureAwait(false);
+        }
+
+        [Command("join")]
+        public async Task Join(CommandContext ctx)
+        {
+            var channel = ctx.Member.VoiceState?.Channel;
+            await channel.ConnectAsync().ConfigureAwait(false);
+        }
+
+        [Command("leave")]
+        public async Task Leave(CommandContext ctx)
+        {
+            var voiceNext = ctx.Client.GetVoiceNext();
+            var connection = voiceNext.GetConnection(ctx.Guild);
+
+            connection.Disconnect();
         }
     }
 }
